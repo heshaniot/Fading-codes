@@ -1,0 +1,66 @@
+% [0 1 2 3],
+%     1.5 2.5
+EbNo_mat1 = [0 0.5 1 1.25 1.5 1.75 2 2.25  2.5 ];
+EbNo_mat2 = [0 0.5 1 1.5 2 2.25 2.5 2.75 3 ];
+EbNo_mat3 = [0 1 1.5 2 2.5 2.75 3 3.25 3.5 3.75 4 ];
+
+
+% EbNo_mat2=  [0 0.5 1      1.5   2 2.5 2.75];
+% EbNo_mat3 = [0 0.5 1 1.5  2     2.5   3 3.5 3.75 ];
+
+R_vec = [13  12  23];
+% R_vec = [13 ];
+K_vec = [680 1020 1360 ];
+N_vec = [2040 2040 2040];
+% K_vec = [168 256 336];
+% N_vec = [516 524 516];
+file = 'N2040';
+L=1;
+for r = 1:length(R_vec)
+    R = R_vec(r);
+    K = K_vec(r);
+    N = N_vec(r);
+    
+    ebno = eval(sprintf('EbNo_mat%d',r));
+    EbNo_vec = ebno ;
+    EbNo = [];
+    BLER = [];
+    BER = [];
+    for i=1:length(EbNo_vec)
+        
+        load(sprintf('LDPC_N%d_K%d_R%d_QAM_OMS_Iter50_1e5_EbNo%.2f_point1.mat',N,K,R,EbNo_vec(i)));     
+        EbNo = [EbNo Results.EbNo];
+        BLER = [BLER Results.BLER];
+        BER = [BER Results.BER];
+               
+    end
+    
+     Results.EbNo = EbNo;
+     Results.BLER = BLER;
+     Results.BER = BER ;
+     
+     filename = sprintf('LDPC_N%d_R%d',N,R);
+     save(filename,'Results')
+
+    subplot(211)
+    semilogy(Results.EbNo,Results.BLER);
+    hold on;
+%     xlim([0 4])
+    grid on
+    title('')
+    subplot(212)
+    semilogy(Results.EbNo,Results.BER);
+    
+    hold on;
+    grid on
+%     xlim([0 4])
+
+    
+end
+
+subplot(211)
+legend('LDPC-1/3 bler','LDPC-1/2 bler','LDPC-2/3 bler')
+
+subplot(212)
+legend('LDPC-1/3 ber','LDPC-1/2 ber','LDPC-2/3 ber')
+
